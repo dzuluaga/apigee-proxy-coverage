@@ -1,4 +1,3 @@
-apigee-proxy-coverage
+Work in progress
 =====================
 
-An attempt to instrument the Apigee Proxy and determine coverage
