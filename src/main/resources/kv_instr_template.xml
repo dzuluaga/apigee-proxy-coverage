@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<KeyValueMapOperations async="false" continueOnError="false" enabled="true" name="%s"  mapIdentifier="instrument">
+    <ExpiryTimeInSecs>-1</ExpiryTimeInSecs>
+    <Put override="true">
+        <Key>
+            <!-- Proxy end point name -->
+            <Parameter ref="%s"/>
+        </Key>
+        <!-- Proxy file name -->
+        <Value ref="%s"/>
+        <!-- Proxy flow name -->
+        <Value ref="%s"/>
+        <!-- Policy name -->
+        <Value ref="%s"/>
+    </Put>
+    <Scope>apiproxy</Scope>
+</KeyValueMapOperations>
