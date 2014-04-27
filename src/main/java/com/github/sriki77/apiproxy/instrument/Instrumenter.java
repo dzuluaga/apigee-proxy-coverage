@@ -10,7 +10,7 @@ import com.github.sriki77.apiproxy.instrument.work.ProxyInstrumeter;
 import java.io.File;
 
 public class Instrumenter {
-    public static void main(String... args) {
+    public static void main(String... args) throws Exception {
         final File file = validateCmdLineArgs(args);
         final Instrumenter instrumenter = new Instrumenter();
         final ProxyFileHandler proxyFileHandler = instrumenter.getProxyFileHandler(file);
@@ -54,7 +54,7 @@ public class Instrumenter {
         }
     }
 
-    private ProxyFileHandler getProxyFileHandler(File file) {
+    private ProxyFileHandler getProxyFileHandler(File file) throws Exception {
         if (file.isDirectory()) {
             return new ProxyDirectoryHandler(file);
         }
