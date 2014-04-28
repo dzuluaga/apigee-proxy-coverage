@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 public interface ProxyFileHandler {
 
-    Stream<Endpoint> getEndPoints();
+    Stream<Endpoint> getEndpoints();
 
-    void updateEndPoint(Endpoint endpoint);
+    void updateEndpoint(Endpoint endpoint);
 }
