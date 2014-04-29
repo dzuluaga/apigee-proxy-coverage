@@ -1,5 +1,6 @@
 package com.github.sriki77.apiproxy.instrument.io;
 
+import com.github.sriki77.apiproxy.instrument.model.Endpoint;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,5 +46,16 @@ public class ProxyDirectoryHandlerTest {
         final List<File> actualList = proxyFiles.collect(Collectors.toList());
         assertThat(actualList.size(), is(allfiles.size()));
         assertThat(actualList, is(allfiles));
+    }
+
+
+    @Test
+    public void shouldReturnStreamOfEndpoints() throws Exception {
+        final Stream<Endpoint> endpoints = handler.getEndpoints();
+        List<File> allfiles = new ArrayList<>();
+        allfiles.addAll(Arrays.asList(proxiesDir.listFiles()));
+        allfiles.addAll(Arrays.asList(targetsDir.listFiles()));
+        final List<Endpoint> endpointList = endpoints.filter(e -> e != null).collect(Collectors.toList());
+        assertThat(endpointList.size(), is(allfiles.size()));
     }
 }
