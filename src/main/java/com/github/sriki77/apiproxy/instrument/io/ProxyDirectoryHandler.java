@@ -20,7 +20,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -38,52 +37,32 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
     }
 
     private void initXMLInfra() throws ParserConfigurationException, TransformerConfigurationException {
-        builder = initDocBuilder();
-        transformer = initTransformer();
+        xStream = xStreamInit();
+        builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        transformer = TransformerFactory.newInstance().newTransformer();
     }
 
     private void initProxyRelatedDIrectories(File proxyDir) {
         apiProxyDir = apiProxyDir(proxyDir);
-        proxyFilesDir = proxyFilesDir();
-        targetFilesDir = targetFilesDir();
-        xStream = xStreamInit();
-    }
-
-    private Transformer initTransformer() throws TransformerConfigurationException {
-        TransformerFactory tFactory = TransformerFactory.newInstance();
-        Transformer transformer = tFactory.newTransformer();
-        return transformer;
-    }
-
-    private DocumentBuilder initDocBuilder() throws ParserConfigurationException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        return factory.newDocumentBuilder();
+        proxyFilesDir = getDirNamed("proxies");
+        targetFilesDir = getDirNamed("targets");
     }
 
     private XStream xStreamInit() {
         final XStream stream = new XStream(new StaxDriver());
-        stream.processAnnotations(new Class[]{ProxyEndpoint.class, Endpoint.class, FaultRule.class,
-                FaultRules.class, Flow.class, FlowSteps.class, RequestFlow.class, ResponseFlow.class, Step.class,
+        stream.processAnnotations(new Class[]{ProxyEndpoint.class,
+                Endpoint.class, FaultRule.class,
+                FaultRules.class, Flow.class, FlowSteps.class,
+                RequestFlow.class, ResponseFlow.class, Step.class,
                 TargetEndpoint.class});
         return stream;
     }
 
-    private File targetFilesDir() {
+    private File getDirNamed(String dirName) {
         if (apiProxyDir == null) {
             return null;
         }
-        final File proxies = new File(apiProxyDir, "targets");
-        if (!proxies.exists()) {
-            return null;
-        }
-        return proxies;
-    }
-
-    private File proxyFilesDir() {
-        if (apiProxyDir == null) {
-            return null;
-        }
-        final File proxies = new File(apiProxyDir, "proxies");
+        final File proxies = new File(apiProxyDir, dirName);
         if (!proxies.exists()) {
             return null;
         }
@@ -105,19 +84,27 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
 
     private Endpoint toEndpoint(File file) {
         try {
-            return (Endpoint) xStream.fromXML(cleanupProxyFile(file));
+            final Document cleanedDocument = cleanupProxyFile(file);
+            final Endpoint endpoint = (Endpoint) xStream.fromXML(toString(cleanedDocument));
+            endpoint.setXMLFile(file);
+            endpoint.setCleanedDocument(cleanedDocument);
+            return endpoint;
         } catch (Exception e) {
             System.err.println("Failed Processing File: " + file);
             throw new RuntimeException(e);
         }
     }
 
-    private String cleanupProxyFile(File file) throws IOException, SAXException, TransformerException {
+    private String toString(Document cleanedDocument) throws TransformerException {
+        final StringWriter cleanedXml = new StringWriter();
+        transformer.transform(new DOMSource(cleanedDocument), new StreamResult(cleanedXml));
+        return cleanedXml.toString();
+    }
+
+    private Document cleanupProxyFile(File file) throws IOException, SAXException, TransformerException {
         final Document document = builder.parse(file);
         cleanupNode(document);
-        final StringWriter cleanedXml = new StringWriter();
-        transformer.transform(new DOMSource(document), new StreamResult(cleanedXml));
-        return cleanedXml.toString();
+        return document;
     }
 
     private void cleanupNode(Node node) {
@@ -130,21 +117,14 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
     }
 
     Stream<File> getProxyFiles() {
-        return Stream.concat(getProxyDirFiles(), getTargetDirFiles());
+        return Stream.concat(getFilesFrom(proxyFilesDir), getFilesFrom(targetFilesDir));
     }
 
-    private Stream<File> getTargetDirFiles() {
-        if (targetFilesDir == null) {
+    private Stream<File> getFilesFrom(File filesDir) {
+        if (filesDir == null) {
             return Stream.empty();
         }
-        return Arrays.stream(targetFilesDir.listFiles((dir, name) -> name.endsWith(".xml")));
-    }
-
-    private Stream<File> getProxyDirFiles() {
-        if (proxyFilesDir == null) {
-            return Stream.empty();
-        }
-        return Arrays.stream(proxyFilesDir.listFiles((dir, name) -> name.endsWith(".xml")));
+        return Arrays.stream(filesDir.listFiles((dir, name) -> name.endsWith(".xml")));
     }
 
     @Override
