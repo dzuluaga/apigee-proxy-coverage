@@ -3,7 +3,9 @@ package com.github.sriki77.apiproxy.instrument.io;
 import com.github.sriki77.apiproxy.instrument.model.*;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
-import org.apache.commons.io.FileUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -13,8 +15,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -27,15 +29,11 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
     private File proxyFilesDir;
     private File targetFilesDir;
     private XStream xStream;
-    private File proxyDir;
-    private final File workingDir;
     private DocumentBuilder builder;
     private Transformer transformer;
 
     public ProxyDirectoryHandler(File proxyDir) throws IOException, ParserConfigurationException, TransformerConfigurationException {
-        this.proxyDir = proxyDir;
         initProxyRelatedDIrectories(proxyDir);
-        workingDir = Files.createTempDirectory("proxy-working-dir").toFile();
         initXMLInfra();
     }
 
@@ -53,8 +51,7 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
 
     private Transformer initTransformer() throws TransformerConfigurationException {
         TransformerFactory tFactory = TransformerFactory.newInstance();
-        StreamSource xslSource = new StreamSource(getClass().getResourceAsStream("/non-flow-tags-remover.xsl"));
-        Transformer transformer = tFactory.newTransformer(xslSource);
+        Transformer transformer = tFactory.newTransformer();
         return transformer;
     }
 
@@ -115,17 +112,21 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
         }
     }
 
-    private File cleanupProxyFile(File file) throws IOException, SAXException, TransformerException {
-        FileUtils.copyFileToDirectory(file, workingDir);
-        File wipFile = new File(workingDir, file.getName());
-        cleanXMLInWipFile(wipFile);
-        return wipFile;
+    private String cleanupProxyFile(File file) throws IOException, SAXException, TransformerException {
+        final Document document = builder.parse(file);
+        cleanupNode(document);
+        final StringWriter cleanedXml = new StringWriter();
+        transformer.transform(new DOMSource(document), new StreamResult(cleanedXml));
+        return cleanedXml.toString();
     }
 
-    private void cleanXMLInWipFile(File file) throws IOException, SAXException, TransformerException {
-        final StringWriter output = new StringWriter();
-        transformer.transform(new StreamSource(file), new StreamResult(output));
-        FileUtils.writeStringToFile(file, output.toString());
+    private void cleanupNode(Node node) {
+        final NodeList topChildren = node.getChildNodes();
+        for (int i = 0; i < topChildren.getLength(); i++) {
+            final Node n = topChildren.item(i);
+            NodeCleaner.clean(n);
+            cleanupNode(n);
+        }
     }
 
     Stream<File> getProxyFiles() {

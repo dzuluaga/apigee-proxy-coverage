@@ -12,7 +12,4 @@ public class Step {
     @XStreamAlias("Condition")
     private String condition;
 
-    @XStreamAlias("FaultRules")
-    @XStreamOmitField
-    protected String faulRules;
 }
