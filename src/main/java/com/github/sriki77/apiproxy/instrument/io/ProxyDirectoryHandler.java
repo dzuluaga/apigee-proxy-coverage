@@ -87,7 +87,7 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
             final Document cleanedDocument = cleanupProxyFile(file);
             final Endpoint endpoint = (Endpoint) xStream.fromXML(toString(cleanedDocument));
             endpoint.setXMLFile(file);
-            endpoint.setCleanedDocument(cleanedDocument);
+            endpoint.holdNode(builder.parse(file));
             return endpoint;
         } catch (Exception e) {
             System.err.println("Failed Processing File: " + file);

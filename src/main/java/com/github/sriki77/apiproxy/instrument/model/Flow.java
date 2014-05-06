@@ -2,9 +2,10 @@ package com.github.sriki77.apiproxy.instrument.model;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import org.w3c.dom.Node;
 
 @XStreamAlias("Flow")
-public class Flow {
+public class Flow implements NodeHolder {
 
     @XStreamAlias("Request")
     protected RequestFlow requestFlow;
@@ -18,4 +19,16 @@ public class Flow {
     @XStreamAlias("name")
     @XStreamAsAttribute
     private String name;
+
+    @Override
+    public void holdNode(Node node) {
+        final Node me = NodeHolder.findMyselfUsingXpath(node, getNodeXPath());
+        NodeHolder.holdNode(requestFlow,node);
+        NodeHolder.holdNode(responseFlow,node);
+    }
+
+    protected String getNodeXPath() {
+        return String.format("//Flow[@name='%s']", name);
+    }
+
 }
