@@ -5,6 +5,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import org.w3c.dom.Node;
 
+import java.util.Collections;
 import java.util.List;
 
 @XStreamAlias("FaultRules")
@@ -18,4 +19,7 @@ public class FaultRules implements NodeHolder {
         NodeHolder.holdNodes(faultRules, node);
     }
 
+    public List<FaultRule> getFaultRules() {
+        return Collections.unmodifiableList(faultRules);
+    }
 }

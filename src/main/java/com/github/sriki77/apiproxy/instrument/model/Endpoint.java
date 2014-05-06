@@ -12,13 +12,13 @@ public abstract class Endpoint implements NodeHolder {
     protected FaultRules faultRules;
 
     @XStreamAlias("PreFlow")
-    protected Flow preflow;
+    protected PreFlow preflow;
 
     @XStreamAlias("Flows")
     protected Flows flows;
 
     @XStreamAlias("PostFlow")
-    protected Flow postflow;
+    protected PostFlow postflow;
 
     @XStreamAlias("name")
     @XStreamAsAttribute
@@ -46,4 +46,23 @@ public abstract class Endpoint implements NodeHolder {
         NodeHolder.holdNode(flows, NodeHolder.findMyselfUsingXpath(node, "//Flows"));
     }
 
+    public FaultRules getFaultRules() {
+        return faultRules;
+    }
+
+    public PreFlow getPreflow() {
+        return preflow;
+    }
+
+    public Flows getFlows() {
+        return flows;
+    }
+
+    public PostFlow getPostflow() {
+        return postflow;
+    }
+
+    public Node getNode() {
+        return node;
+    }
 }

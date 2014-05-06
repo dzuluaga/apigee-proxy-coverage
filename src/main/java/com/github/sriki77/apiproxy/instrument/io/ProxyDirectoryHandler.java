@@ -129,7 +129,11 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
 
     @Override
     public void updateEndpoint(Endpoint endpoint) {
-
+        try {
+            transformer.transform(new DOMSource(endpoint.getNode()), new StreamResult(endpoint.getXmlFile()));
+        } catch (TransformerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

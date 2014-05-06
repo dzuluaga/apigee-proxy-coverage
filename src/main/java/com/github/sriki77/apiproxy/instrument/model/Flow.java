@@ -22,13 +22,23 @@ public class Flow implements NodeHolder {
 
     @Override
     public void holdNode(Node node) {
-        final Node me = NodeHolder.findMyselfUsingXpath(node, getNodeXPath());
-        NodeHolder.holdNode(requestFlow,node);
-        NodeHolder.holdNode(responseFlow,node);
+        NodeHolder.holdNode(requestFlow, NodeHolder.findMyselfUsingXpath(node, getReqNodeXPath()));
+        NodeHolder.holdNode(responseFlow, NodeHolder.findMyselfUsingXpath(node, getResNodeXPath()));
     }
 
-    protected String getNodeXPath() {
-        return String.format("//Flow[@name='%s']", name);
+    protected String getReqNodeXPath() {
+        return String.format("//Flow[@name='%s']/Request", name);
     }
 
+    protected String getResNodeXPath() {
+        return String.format("//Flow[@name='%s']/Response", name);
+    }
+
+    public RequestFlow getRequestFlow() {
+        return requestFlow;
+    }
+
+    public ResponseFlow getResponseFlow() {
+        return responseFlow;
+    }
 }

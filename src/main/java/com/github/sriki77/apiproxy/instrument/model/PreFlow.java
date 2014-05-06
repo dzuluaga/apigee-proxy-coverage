@@ -6,7 +6,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public class PreFlow extends Flow {
 
     @Override
-    protected String getNodeXPath() {
-        return "//PreFlow";
+    protected String getReqNodeXPath() {
+        return "//PreFlow/Request";
+    }
+
+    @Override
+    protected String getResNodeXPath() {
+        return "//PreFlow/Response";
     }
 }

@@ -5,7 +5,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("PostFlow")
 public class PostFlow extends Flow {
     @Override
-    protected String getNodeXPath() {
-        return "//PostFlow";
+    protected String getReqNodeXPath() {
+        return "//PostFlow/Request";
+    }
+
+    @Override
+    protected String getResNodeXPath() {
+        return "//PostFlow/Response";
     }
 }

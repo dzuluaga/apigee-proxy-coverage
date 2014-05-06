@@ -16,4 +16,9 @@ public class FaultRule extends FlowSteps {
         this.node = NodeHolder.findMyselfUsingXpath(node, String.format("//FaultRule[@name='%s']", name));
     }
 
+
+    @Override
+    protected Node getDOMNode() {
+        return node;
+    }
 }

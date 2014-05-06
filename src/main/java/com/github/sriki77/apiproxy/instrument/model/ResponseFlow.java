@@ -12,4 +12,9 @@ public class ResponseFlow extends FlowSteps {
     public void holdNode(Node node) {
         this.node = node;
     }
+
+    @Override
+    protected Node getDOMNode() {
+        return node;
+    }
 }

@@ -13,4 +13,8 @@ public class RequestFlow extends FlowSteps {
         this.node = node;
     }
 
+    @Override
+    protected Node getDOMNode() {
+        return node;
+    }
 }
