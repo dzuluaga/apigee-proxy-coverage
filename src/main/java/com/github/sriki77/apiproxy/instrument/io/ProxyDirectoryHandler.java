@@ -30,6 +30,7 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
     private XStream xStream;
     private DocumentBuilder builder;
     private Transformer transformer;
+    protected File proxyDir;
 
     public ProxyDirectoryHandler(File proxyDir) throws IOException, ParserConfigurationException, TransformerConfigurationException {
         initProxyRelatedDIrectories(proxyDir);
@@ -43,6 +44,7 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
     }
 
     private void initProxyRelatedDIrectories(File proxyDir) {
+        this.proxyDir = proxyDir;
         apiProxyDir = apiProxyDir(proxyDir);
         proxyFilesDir = getDirNamed("proxies");
         targetFilesDir = getDirNamed("targets");
