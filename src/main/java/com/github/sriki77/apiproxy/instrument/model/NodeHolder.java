@@ -14,7 +14,7 @@ public interface NodeHolder {
 
     static void holdNodes(List<? extends NodeHolder> nodeHolders, Node node) {
         if (nodeHolders != null) {
-            nodeHolders.forEach(d -> d.holdNode(node));
+            nodeHolders.forEach(d -> holdNode(d, node));
         }
     }
 

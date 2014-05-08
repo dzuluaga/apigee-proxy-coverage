@@ -14,4 +14,9 @@ public class PreFlow extends Flow {
     protected String getResNodeXPath() {
         return "//PreFlow/Response";
     }
+
+    @Override
+    public String location() {
+        return LocationProvider.append(parent, "PreFlow");
+    }
 }

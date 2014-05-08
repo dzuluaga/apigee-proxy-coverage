@@ -1,17 +1,15 @@
 package com.github.sriki77.apiproxy.instrument.io;
 
-import com.github.sriki77.apiproxy.instrument.model.*;
+import com.github.sriki77.apiproxy.instrument.model.Endpoint;
+import com.github.sriki77.apiproxy.instrument.model.FaultRule;
+import com.github.sriki77.apiproxy.instrument.model.FlowSteps;
+import com.github.sriki77.apiproxy.instrument.model.Step;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
-import static org.custommonkey.xmlunit.XMLAssert.assertXpathValuesEqual;
-import static org.custommonkey.xmlunit.XMLAssert.assertXpathValuesNotEqual;
+import static org.custommonkey.xmlunit.XMLAssert.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -126,7 +122,46 @@ public class ProxyDirectoryHandlerTest {
 
     }
 
-    private Document toDocument(File xmlFile) throws ParserConfigurationException, IOException, SAXException {
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile);
+    @Test
+    public void shouldReturnCorrectLocationOfStep() throws Exception {
+        final Optional<Endpoint> optEndpoint = handler.getEndpoints().findFirst();
+        assertThat(optEndpoint.isPresent(), is(true));
+        final Endpoint endpoint = optEndpoint.get();
+        final FaultRule faultRule = endpoint.getFaultRules().getFaultRules().get(0);
+        String location = faultRule.getSteps().get(0).location();
+        assertThat(location.contains("Proxy:map_getAccessToken"),is(true));
+        assertThat(location.contains("proxies/map_getAccessToken.xml"),is(true));
+        assertThat(location.contains("FaultRule: FaultHandler"),is(true));
+        assertThat(location.contains("Policy: js_setup_splunk_vars"),is(true));
+
+        location=endpoint.getPreflow().getRequestFlow().getSteps().get(0).location();
+        assertThat(location.contains("Proxy:map_getAccessToken"),is(true));
+        assertThat(location.contains("proxies/map_getAccessToken.xml"),is(true));
+        assertThat(location.contains("PreFlow:RequestFlow"),is(true));
+        assertThat(location.contains("Policy: js_set_flow_resource_name"), is(true));
+
+        location=endpoint.getPostflow().getResponseFlow().getSteps().get(0).location();
+        assertThat(location.contains("Proxy:map_getAccessToken"), is(true));
+        assertThat(location.contains("proxies/map_getAccessToken.xml"),is(true));
+        assertThat(location.contains("PostFlow:ResponseFlow"),is(true));
+        assertThat(location.contains("Policy: js_setup_splunk_vars"),is(true));
+
+        location=endpoint.getFlows().getFlows().get(0).getRequestFlow().getSteps().get(0).location();
+        assertThat(location.contains("Proxy:map_getAccessToken"),is(true));
+        assertThat(location.contains("proxies/map_getAccessToken.xml"),is(true));
+        assertThat(location.contains("map_getAccessToken:RequestFlow"),is(true));
+        assertThat(location.contains("Policy: keymap_get_auth_salt"),is(true));
+
+
+        location=endpoint.getFlows().getFlows().get(0).getResponseFlow().getSteps().get(0).location();
+        assertThat(location.contains("Proxy:map_getAccessToken"),is(true));
+        assertThat(location.contains("proxies/map_getAccessToken.xml"),is(true));
+        assertThat(location.contains("map_getAccessToken:ResponseFlow"),is(true));
+        assertThat(location.contains("Policy: js_alter_token_exp_for_response"),is(true));
+
+
+
+
     }
+
 }

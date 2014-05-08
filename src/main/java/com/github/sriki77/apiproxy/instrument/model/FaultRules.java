@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 @XStreamAlias("FaultRules")
-public class FaultRules implements NodeHolder {
+public class FaultRules implements NodeHolder, LocationProvider {
 
     @XStreamImplicit(itemFieldName = "FaultRule")
     private List<FaultRule> faultRules;
@@ -21,5 +21,11 @@ public class FaultRules implements NodeHolder {
 
     public List<FaultRule> getFaultRules() {
         return Collections.unmodifiableList(faultRules);
+    }
+
+
+    @Override
+    public void setParent(LocationProvider parent) {
+        LocationProvider.setParent(faultRules, parent);
     }
 }

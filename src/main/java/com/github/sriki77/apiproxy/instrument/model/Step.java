@@ -3,15 +3,16 @@ package com.github.sriki77.apiproxy.instrument.model;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("Step")
-public class Step {
+public class Step implements LocationProvider {
 
     @XStreamAlias("Name")
     private String name;
 
     @XStreamAlias("Condition")
     private String condition;
+    private LocationProvider parent;
 
-     public Step() {
+    public Step() {
 
     }
 
@@ -49,4 +50,17 @@ public class Step {
         return new Step(name, condition);
     }
 
+    @Override
+    public void setParent(LocationProvider parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public String location() {
+        String loc = "Policy: " + name;
+        if (condition != null) {
+            loc += " Condition: " + condition;
+        }
+        return LocationProvider.append(parent, loc);
+    }
 }

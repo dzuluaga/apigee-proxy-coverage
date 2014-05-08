@@ -9,10 +9,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class FlowSteps implements NodeHolder {
+public abstract class FlowSteps implements NodeHolder, LocationProvider {
 
     @XStreamImplicit(itemFieldName = "Step")
     protected List<Step> steps;
+
+    protected LocationProvider parent;
 
     @Override
     public String toString() {
@@ -82,6 +84,13 @@ public abstract class FlowSteps implements NodeHolder {
             }
         }
         throw new RuntimeException(index + "th step node not found");
+    }
+
+
+    @Override
+    public void setParent(LocationProvider parent) {
+        this.parent = parent;
+        LocationProvider.setParent(steps, this);
     }
 
     protected abstract Node getDOMNode();

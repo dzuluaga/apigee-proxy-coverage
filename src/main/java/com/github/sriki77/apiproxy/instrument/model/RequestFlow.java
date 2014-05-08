@@ -17,4 +17,9 @@ public class RequestFlow extends FlowSteps {
     protected Node getDOMNode() {
         return node;
     }
+
+    @Override
+    public String location() {
+        return parent.location()+":RequestFlow";
+    }
 }

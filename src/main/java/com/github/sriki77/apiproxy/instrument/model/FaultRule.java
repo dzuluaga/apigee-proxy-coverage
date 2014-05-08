@@ -21,4 +21,12 @@ public class FaultRule extends FlowSteps {
     protected Node getDOMNode() {
         return node;
     }
+
+    @Override
+    public String location() {
+        return LocationProvider.append(parent, "FaultRule: " + name);
+    }
+
+
+
 }

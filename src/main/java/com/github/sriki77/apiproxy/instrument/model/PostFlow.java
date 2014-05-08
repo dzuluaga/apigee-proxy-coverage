@@ -13,4 +13,9 @@ public class PostFlow extends Flow {
     protected String getResNodeXPath() {
         return "//PostFlow/Response";
     }
+
+    @Override
+    public String location() {
+        return LocationProvider.append(parent, "PostFlow");
+    }
 }
