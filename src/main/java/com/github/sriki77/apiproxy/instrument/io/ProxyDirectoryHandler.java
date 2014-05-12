@@ -3,6 +3,7 @@ package com.github.sriki77.apiproxy.instrument.io;
 import com.github.sriki77.apiproxy.instrument.model.*;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
+import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -21,6 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ProxyDirectoryHandler implements ProxyFileHandler {
@@ -31,6 +34,7 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
     private DocumentBuilder builder;
     private Transformer transformer;
     protected File proxyDir;
+    private File policyDir;
 
     public ProxyDirectoryHandler(File proxyDir) throws IOException, ParserConfigurationException, TransformerConfigurationException {
         initProxyRelatedDIrectories(proxyDir);
@@ -48,6 +52,7 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
         apiProxyDir = apiProxyDir(proxyDir);
         proxyFilesDir = getDirNamed("proxies");
         targetFilesDir = getDirNamed("targets");
+        policyDir = getDirNamed("policies");
     }
 
     private XStream xStreamInit() {
@@ -80,15 +85,15 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
     }
 
     @Override
-    public Stream<Endpoint> getEndpoints() {
-        return getProxyFiles().map(this::toEndpoint);
+    public List<Endpoint> getEndpoints() {
+        return getProxyFiles().map(this::toEndpoint).collect(Collectors.toList());
     }
 
     private Endpoint toEndpoint(File file) {
         try {
             final Document cleanedDocument = cleanupProxyFile(file);
             final Endpoint endpoint = (Endpoint) xStream.fromXML(toString(cleanedDocument));
-            endpoint.init(file,builder.parse(file));
+            endpoint.init(file, builder.parse(file));
             return endpoint;
         } catch (Exception e) {
             System.err.println("Failed Processing File: " + file);
@@ -133,6 +138,18 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
         try {
             transformer.transform(new DOMSource(endpoint.getNode()), new StreamResult(endpoint.getXmlFile()));
         } catch (TransformerException e) {
+            throw new RuntimeException(e);
+        }
+        final List<PolicyUpdate> updates = endpoint.updates();
+        updates.forEach(this::createFile);
+    }
+
+    private void createFile(PolicyUpdate u) {
+        try {
+            final String policyFileName = u.name + "_" + System.currentTimeMillis();
+            final File policyName = new File(policyDir, policyFileName + ".xml");
+            FileUtils.writeStringToFile(policyName, u.updateFileName(policyFileName));
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

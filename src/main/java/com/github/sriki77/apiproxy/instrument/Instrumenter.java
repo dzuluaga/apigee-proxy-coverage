@@ -4,18 +4,20 @@ package com.github.sriki77.apiproxy.instrument;
 import com.github.sriki77.apiproxy.instrument.io.ProxyDirectoryHandler;
 import com.github.sriki77.apiproxy.instrument.io.ProxyFileHandler;
 import com.github.sriki77.apiproxy.instrument.io.ProxyZipFileHandler;
-import com.github.sriki77.apiproxy.instrument.work.KVMapBasedProxyInstrumenter;
-import com.github.sriki77.apiproxy.instrument.work.ProxyInstrumeter;
+import com.github.sriki77.apiproxy.instrument.model.Endpoint;
 
 import java.io.File;
+import java.util.List;
 
 public class Instrumenter {
     public static void main(String... args) throws Exception {
         final File file = validateCmdLineArgs(args);
         final Instrumenter instrumenter = new Instrumenter();
         final ProxyFileHandler proxyFileHandler = instrumenter.getProxyFileHandler(file);
-        final ProxyInstrumeter proxyInstrumenter = instrumenter.getProxyInstrumenter();
-        proxyInstrumenter.instrument(proxyFileHandler);
+        final ProxyInstrumeter proxyInstrumenter = instrumenter.getProxyInstrumenter(proxyFileHandler.getEndpoints());
+        final List<Endpoint> instrumentedEndPoints = proxyInstrumenter.instrument();
+        instrumentedEndPoints.forEach(e -> System.err.println(e));
+
     }
 
     private static File validateCmdLineArgs(String[] args) {
@@ -58,12 +60,11 @@ public class Instrumenter {
         if (file.isDirectory()) {
             return new ProxyDirectoryHandler(file);
         }
-
         return new ProxyZipFileHandler(file);
     }
 
-    public ProxyInstrumeter getProxyInstrumenter() {
-        return new KVMapBasedProxyInstrumenter();
+    public ProxyInstrumeter getProxyInstrumenter(List<Endpoint> endpoints) {
+        return new KVMapBasedProxyInstrumenter(endpoints);
     }
 }
 

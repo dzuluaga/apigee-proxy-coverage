@@ -6,27 +6,17 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public class Step implements LocationProvider {
 
     @XStreamAlias("Name")
-    private String name;
+    protected String name;
 
     @XStreamAlias("Condition")
-    private String condition;
-    private LocationProvider parent;
+    protected String condition;
 
-    public Step() {
+    protected LocationProvider parent;
 
-    }
-
-    protected Step(String name, String condition) {
+    protected Step(String name, String condition, LocationProvider parent) {
         this.name = name;
         this.condition = condition;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getCondition() {
-        return condition;
+        this.parent = parent;
     }
 
     public void setName(String name) {
@@ -47,7 +37,7 @@ public class Step implements LocationProvider {
 
 
     public Step duplicate() {
-        return new Step(name, condition);
+        return new Step(name, condition, parent);
     }
 
     @Override
@@ -62,5 +52,14 @@ public class Step implements LocationProvider {
             loc += " Condition: " + condition;
         }
         return LocationProvider.append(parent, loc);
+    }
+
+    public String initUsingTemplate(String template) {
+        return String.format(template,LocationProvider.endpointName(this),
+                LocationProvider.proxyFileName(this), LocationProvider.flowName(this), LocationProvider.policyName(this));
+    }
+
+    public String getName() {
+        return name;
     }
 }

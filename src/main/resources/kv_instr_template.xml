@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<KeyValueMapOperations async="false" continueOnError="false" enabled="true" name="%s"  mapIdentifier="instrument">
+<KeyValueMapOperations async="false" continueOnError="false" enabled="true" name="#kv#"  mapIdentifier="instrument">
     <ExpiryTimeInSecs>-1</ExpiryTimeInSecs>
     <Put override="true">
         <Key>

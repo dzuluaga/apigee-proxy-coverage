@@ -20,7 +20,7 @@ public class FaultRules implements NodeHolder, LocationProvider {
     }
 
     public List<FaultRule> getFaultRules() {
-        return Collections.unmodifiableList(faultRules);
+        return faultRules == null ? Collections.emptyList() : Collections.unmodifiableList(faultRules);
     }
 
 

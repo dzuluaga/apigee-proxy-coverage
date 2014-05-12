@@ -11,7 +11,7 @@ import java.util.List;
 public class Flows implements NodeHolder, LocationProvider {
 
     @XStreamImplicit(itemFieldName = "Flow")
-    protected List<Flow> flows;
+    protected List<Flow> flows ;
 
     @Override
     public void holdNode(Node node) {
@@ -25,6 +25,6 @@ public class Flows implements NodeHolder, LocationProvider {
     }
 
     public List<Flow> getFlows() {
-        return Collections.unmodifiableList(flows);
+        return flows == null ? Collections.emptyList() : Collections.unmodifiableList(flows);
     }
 }

@@ -24,7 +24,7 @@ public abstract class FlowSteps implements NodeHolder, LocationProvider {
     }
 
     public List<Step> getSteps() {
-        return Collections.unmodifiableList(steps);
+        return steps == null ? Collections.emptyList() : Collections.unmodifiableList(steps);
     }
 
     public Step cloneStep(Step step) {

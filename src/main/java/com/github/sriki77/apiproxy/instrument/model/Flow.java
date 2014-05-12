@@ -37,11 +37,11 @@ public class Flow implements NodeHolder, LocationProvider {
     }
 
     public RequestFlow getRequestFlow() {
-        return requestFlow;
+        return requestFlow == null ? new RequestFlow() : requestFlow;
     }
 
     public ResponseFlow getResponseFlow() {
-        return responseFlow;
+        return responseFlow == null ? new ResponseFlow() : responseFlow;
     }
 
     @Override

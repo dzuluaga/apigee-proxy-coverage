@@ -11,7 +11,7 @@ public class DOMStep extends Step {
     private Optional<Node> condNode;
 
     public DOMStep(Step inner, Optional<Node> nameNode, Optional<Node> condNode) {
-        super(inner.getName(), inner.getCondition());
+        super(inner.name,inner.condition,inner.parent);
         this.inner = inner;
         this.nameNode = nameNode;
         this.condNode = condNode;

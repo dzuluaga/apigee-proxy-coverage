@@ -6,6 +6,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Endpoint implements NodeHolder, LocationProvider {
 
@@ -27,8 +29,10 @@ public abstract class Endpoint implements NodeHolder, LocationProvider {
 
 
     private File xmlFile;
+
     private Node node;
 
+    private List<PolicyUpdate> updates;
 
     public File getXmlFile() {
         return xmlFile;
@@ -44,19 +48,19 @@ public abstract class Endpoint implements NodeHolder, LocationProvider {
     }
 
     public FaultRules getFaultRules() {
-        return faultRules;
+        return faultRules == null ? new FaultRules() : faultRules;
     }
 
     public PreFlow getPreflow() {
-        return preflow;
+        return preflow == null ? new PreFlow() : preflow;
     }
 
     public Flows getFlows() {
-        return flows;
+        return flows == null ? new Flows() : flows;
     }
 
     public PostFlow getPostflow() {
-        return postflow;
+        return postflow == null ? new PostFlow() : postflow;
     }
 
     public Node getNode() {
@@ -83,5 +87,16 @@ public abstract class Endpoint implements NodeHolder, LocationProvider {
         LocationProvider.setParent(preflow, parent);
         LocationProvider.setParent(postflow, parent);
         LocationProvider.setParent(flows, parent);
+    }
+
+    public void addUpdate(PolicyUpdate update) {
+        if (updates == null) {
+            this.updates = new ArrayList<>();
+        }
+        this.updates.add(update);
+    }
+
+    public List<PolicyUpdate> updates() {
+        return updates == null ? new ArrayList<>() : updates;
     }
 }
