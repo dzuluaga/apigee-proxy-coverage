@@ -9,7 +9,4 @@ public class PolicyUpdate {
         this.policyData = policyData;
     }
 
-    public String updateFileName(String name) {
-        return policyData.replace("#kv#", name);
-    }
 }

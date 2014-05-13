@@ -15,11 +15,17 @@ public class DOMStep extends Step {
         this.inner = inner;
         this.nameNode = nameNode;
         this.condNode = condNode;
+        this.baseName= inner.baseName;
+        setName(inner.name);
+        setCondition(inner.condition);
     }
 
 
     @Override
     public void setName(String name) {
+        if(name==null){
+            return;
+        }
         validateNodePresence(nameNode);
         super.setName(name);
         inner.setName(name);
@@ -41,6 +47,9 @@ public class DOMStep extends Step {
 
     @Override
     public void setCondition(String condition) {
+        if(condition==null){
+            return;
+        }
         validateNodePresence(condNode);
         super.setCondition(condition);
         inner.setCondition(condition);

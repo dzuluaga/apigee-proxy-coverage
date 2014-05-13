@@ -11,6 +11,8 @@ public class Step implements LocationProvider {
     @XStreamAlias("Condition")
     protected String condition;
 
+    protected String baseName;
+
     protected LocationProvider parent;
 
     protected Step(String name, String condition, LocationProvider parent) {
@@ -37,7 +39,9 @@ public class Step implements LocationProvider {
 
 
     public Step duplicate() {
-        return new Step(name, condition, parent);
+        final Step copy = new Step(name + System.currentTimeMillis(), condition, parent);
+        copy.baseName = name;
+        return copy;
     }
 
     @Override
@@ -54,9 +58,18 @@ public class Step implements LocationProvider {
         return LocationProvider.append(parent, loc);
     }
 
-    public String initUsingTemplate(String template) {
-        return String.format(template,LocationProvider.endpointName(this),
-                LocationProvider.proxyFileName(this), LocationProvider.flowName(this), LocationProvider.policyName(this));
+
+    public String locationUsingBaseName() {
+        String loc = "Policy: " + baseName;
+        if (condition != null) {
+            loc += " Condition: " + condition;
+        }
+        return LocationProvider.append(parent, loc);
+    }
+
+    public String initUsingTemplate(String template, String name) {
+        return String.format(template, name, LocationProvider.endpointName(this),
+                LocationProvider.proxyFileName(this), LocationProvider.flowName(this), locationUsingBaseName());
     }
 
     public String getName() {

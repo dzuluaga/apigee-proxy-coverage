@@ -127,13 +127,13 @@ public class ProxyDirectoryHandlerTest {
         assertThat(optEndpoint.isPresent(), is(true));
         final Endpoint endpoint = optEndpoint.get();
         final String policyName = "test-policy";
-        final String policyData = "Hello test #kv#";
+        final String policyData = "Hello test";
         final PolicyUpdate policyUpdate = new PolicyUpdate(policyName, policyData);
         endpoint.addUpdate(policyUpdate);
         handler.updateEndpoint(endpoint);
         final Optional<File> policyFile = Stream.of(policyDir.listFiles()).filter(e -> e.getName().startsWith(policyName)).findFirst();
         assertThat(policyFile.isPresent(), is(true));
-        assertThat(FileUtils.readFileToString(policyFile.get()), is("Hello test "+policyFile.get().getName().replace(".xml","")));
+        assertThat(FileUtils.readFileToString(policyFile.get()), is("Hello test"));
 
 
     }
@@ -146,32 +146,32 @@ public class ProxyDirectoryHandlerTest {
         final FaultRule faultRule = endpoint.getFaultRules().getFaultRules().get(0);
         String location = faultRule.getSteps().get(0).location();
         assertThat(location.contains("Proxy:map_getAccessToken"), is(true));
-        assertThat(location.contains("proxies/map_getAccessToken.xml"), is(true));
+        assertThat(location.contains("map_getAccessToken.xml"), is(true));
         assertThat(location.contains("FaultRule: FaultHandler"), is(true));
         assertThat(location.contains("Policy: js_setup_splunk_vars"), is(true));
 
         location = endpoint.getPreflow().getRequestFlow().getSteps().get(0).location();
         assertThat(location.contains("Proxy:map_getAccessToken"), is(true));
-        assertThat(location.contains("proxies/map_getAccessToken.xml"), is(true));
+        assertThat(location.contains("map_getAccessToken.xml"), is(true));
         assertThat(location.contains("PreFlow:RequestFlow"), is(true));
         assertThat(location.contains("Policy: js_set_flow_resource_name"), is(true));
 
         location = endpoint.getPostflow().getResponseFlow().getSteps().get(0).location();
         assertThat(location.contains("Proxy:map_getAccessToken"), is(true));
-        assertThat(location.contains("proxies/map_getAccessToken.xml"), is(true));
+        assertThat(location.contains("map_getAccessToken.xml"), is(true));
         assertThat(location.contains("PostFlow:ResponseFlow"), is(true));
         assertThat(location.contains("Policy: js_setup_splunk_vars"), is(true));
 
         location = endpoint.getFlows().getFlows().get(0).getRequestFlow().getSteps().get(0).location();
         assertThat(location.contains("Proxy:map_getAccessToken"), is(true));
-        assertThat(location.contains("proxies/map_getAccessToken.xml"), is(true));
+        assertThat(location.contains("map_getAccessToken.xml"), is(true));
         assertThat(location.contains("map_getAccessToken:RequestFlow"), is(true));
         assertThat(location.contains("Policy: keymap_get_auth_salt"), is(true));
 
 
         location = endpoint.getFlows().getFlows().get(0).getResponseFlow().getSteps().get(0).location();
         assertThat(location.contains("Proxy:map_getAccessToken"), is(true));
-        assertThat(location.contains("proxies/map_getAccessToken.xml"), is(true));
+        assertThat(location.contains("map_getAccessToken.xml"), is(true));
         assertThat(location.contains("map_getAccessToken:ResponseFlow"), is(true));
         assertThat(location.contains("Policy: js_alter_token_exp_for_response"), is(true));
 

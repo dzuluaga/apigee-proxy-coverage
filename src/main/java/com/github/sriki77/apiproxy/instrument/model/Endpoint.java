@@ -69,7 +69,7 @@ public abstract class Endpoint implements NodeHolder, LocationProvider {
 
     @Override
     public String location() {
-        return endpointType() + ":" + name + ",File:" + xmlFile;
+        return endpointType() + ":" + name + ",File:" + xmlFile.getName();
     }
 
 

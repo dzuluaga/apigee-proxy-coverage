@@ -13,11 +13,11 @@ public class Instrumenter {
     public static void main(String... args) throws Exception {
         final File file = validateCmdLineArgs(args);
         final Instrumenter instrumenter = new Instrumenter();
-        final ProxyFileHandler proxyFileHandler = instrumenter.getProxyFileHandler(file);
-        final ProxyInstrumeter proxyInstrumenter = instrumenter.getProxyInstrumenter(proxyFileHandler.getEndpoints());
-        final List<Endpoint> instrumentedEndPoints = proxyInstrumenter.instrument();
-        instrumentedEndPoints.forEach(e -> System.err.println(e));
-
+        try (ProxyFileHandler proxyFileHandler = instrumenter.getProxyFileHandler(file)) {
+            final ProxyInstrumeter proxyInstrumenter = instrumenter.getProxyInstrumenter(proxyFileHandler.getEndpoints());
+            final List<Endpoint> instrumentedEndPoints = proxyInstrumenter.instrument();
+            instrumentedEndPoints.forEach(proxyFileHandler::updateEndpoint);
+        }
     }
 
     private static File validateCmdLineArgs(String[] args) {

@@ -146,12 +146,14 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
 
     private void createFile(PolicyUpdate u) {
         try {
-            final String policyFileName = u.name + "_" + System.currentTimeMillis();
-            final File policyName = new File(policyDir, policyFileName + ".xml");
-            FileUtils.writeStringToFile(policyName, u.updateFileName(policyFileName));
+            final File policyName = new File(policyDir, u.name + ".xml");
+            FileUtils.writeStringToFile(policyName, u.policyData);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @Override
+    public void close() throws IOException {
+    }
 }

@@ -44,7 +44,7 @@ public class KVMapBasedProxyInstrumenter implements ProxyInstrumeter {
         final Step step = f.cloneStep(s);
         try {
             String template = getStepTemplate();
-            final String policyData = step.initUsingTemplate(template);
+            final String policyData = step.initUsingTemplate(template,step.getName());
             e.addUpdate(new PolicyUpdate(step.getName(), policyData));
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);

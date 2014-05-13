@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<KeyValueMapOperations async="false" continueOnError="false" enabled="true" name="#kv#"  mapIdentifier="instrument">
+<KeyValueMapOperations async="false" continueOnError="false" enabled="true" name="%1$s"  mapIdentifier="instrument">
+    <ExclusiveCache>false</ExclusiveCache>
     <ExpiryTimeInSecs>-1</ExpiryTimeInSecs>
     <Put override="true">
         <Key>
             <!-- Proxy end point name -->
-            <Parameter ref="%s"/>
+            <Parameter>%1$s</Parameter>
         </Key>
+        <!-- Proxy endpoint name -->
+        <Value>%2$s</Value>
+
         <!-- Proxy file name -->
-        <Value ref="%s"/>
+        <Value>%3$s</Value>
+
         <!-- Proxy flow name -->
-        <Value ref="%s"/>
+        <Value>%4$s</Value>
+
         <!-- Policy name -->
-        <Value ref="%s"/>
+        <Value>%5$s</Value>
     </Put>
     <Scope>apiproxy</Scope>
 </KeyValueMapOperations>

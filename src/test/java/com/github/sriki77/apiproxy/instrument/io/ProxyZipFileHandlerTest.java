@@ -47,7 +47,7 @@ public class ProxyZipFileHandlerTest {
         assertThat(apiproxy.isDirectory(), is(true));
         final String data = "Hello World From Text!!";
         FileUtils.writeStringToFile(new File(apiproxy, "test.txt"), data);
-        final File instrumentedZipFile = handler.instrumentedZipFile();
+        final File instrumentedZipFile = handler.buildInstrumentedZipFile();
         assertThat(instrumentedZipFile.exists(), is(true));
         assertThat(instrumentedZipFile.isFile(), is(true));
         final URL jarUrl =
