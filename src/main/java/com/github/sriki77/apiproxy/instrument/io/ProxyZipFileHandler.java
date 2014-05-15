@@ -40,6 +40,7 @@ public class ProxyZipFileHandler extends ProxyDirectoryHandler {
 
     @Override
     public void close() throws IOException {
+        super.close();
         File instrZipFile = buildInstrumentedZipFile();
         System.err.println("Instrument File generated: " + instrZipFile);
     }

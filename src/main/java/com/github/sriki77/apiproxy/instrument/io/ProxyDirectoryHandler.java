@@ -19,14 +19,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ProxyDirectoryHandler implements ProxyFileHandler {
+public class ProxyDirectoryHandler implements ProxyFileHandler, ProxyStatsCollector {
     private File apiProxyDir;
     private File proxyFilesDir;
     private File targetFilesDir;
@@ -36,8 +37,11 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
     protected File proxyDir;
     private File policyDir;
 
+    private Properties stats = new Properties();
+    private File statsFile;
+
     public ProxyDirectoryHandler(File proxyDir) throws IOException, ParserConfigurationException, TransformerConfigurationException {
-        initProxyRelatedDIrectories(proxyDir);
+        initProxyRelatedDirectories(proxyDir);
         initXMLInfra();
     }
 
@@ -47,12 +51,13 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
         transformer = TransformerFactory.newInstance().newTransformer();
     }
 
-    private void initProxyRelatedDIrectories(File proxyDir) {
+    private void initProxyRelatedDirectories(File proxyDir) {
         this.proxyDir = proxyDir;
         apiProxyDir = apiProxyDir(proxyDir);
         proxyFilesDir = getDirNamed("proxies");
         targetFilesDir = getDirNamed("targets");
         policyDir = getDirNamed("policies");
+        statsFile = new File(apiProxyDir, "stats.txt");
     }
 
     private XStream xStreamInit() {
@@ -155,5 +160,11 @@ public class ProxyDirectoryHandler implements ProxyFileHandler {
 
     @Override
     public void close() throws IOException {
+        stats.store(new FileWriter(statsFile), "Proxy Stats Generated: " + LocalDate.now());
+    }
+
+    @Override
+    public void update(String measure, int count) {
+        stats.setProperty(measure, "" + count);
     }
 }
