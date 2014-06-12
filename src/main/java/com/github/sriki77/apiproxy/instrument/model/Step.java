@@ -1,6 +1,7 @@
 package com.github.sriki77.apiproxy.instrument.model;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("Step")
 public class Step implements LocationProvider {
@@ -10,6 +11,10 @@ public class Step implements LocationProvider {
 
     @XStreamAlias("Condition")
     protected String condition;
+
+    @XStreamAlias("executed")
+    @XStreamAsAttribute
+    protected boolean executed=true;
 
     protected String baseName;
 
@@ -75,4 +80,9 @@ public class Step implements LocationProvider {
     public String getName() {
         return name;
     }
+
+    public void setExecuted(boolean executed) {
+        this.executed = executed;
+    }
+
 }
