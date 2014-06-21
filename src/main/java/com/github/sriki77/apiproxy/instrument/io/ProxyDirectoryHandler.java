@@ -1,8 +1,8 @@
 package com.github.sriki77.apiproxy.instrument.io;
 
-import com.github.sriki77.apiproxy.instrument.model.*;
+import com.github.sriki77.apiproxy.instrument.model.Endpoint;
+import com.github.sriki77.apiproxy.instrument.model.PolicyUpdate;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -19,15 +19,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ProxyDirectoryHandler implements ProxyFileHandler, ProxyStatsCollector {
+import static com.github.sriki77.apiproxy.instrument.io.Util.xStreamInit;
+
+public class ProxyDirectoryHandler implements ProxyFileHandler {
     private File apiProxyDir;
     private File proxyFilesDir;
     private File targetFilesDir;
@@ -36,13 +37,26 @@ public class ProxyDirectoryHandler implements ProxyFileHandler, ProxyStatsCollec
     private Transformer transformer;
     protected File proxyDir;
     private File policyDir;
-
-    private Properties stats = new Properties();
-    private File statsFile;
+    private String proxyName;
 
     public ProxyDirectoryHandler(File proxyDir) throws IOException, ParserConfigurationException, TransformerConfigurationException {
         initProxyRelatedDirectories(proxyDir);
         initXMLInfra();
+        determineProxyName();
+    }
+
+    private void determineProxyName() {
+        final File[] files = apiProxyDir.listFiles((dir, name) -> name.endsWith(".xml"));
+        if (files.length == 0) {
+            return;
+        }
+        try {
+            final Document document = builder.parse(files[0]);
+            final Node apiProxy = document.getElementsByTagName("APIProxy").item(0);
+            proxyName = apiProxy.getAttributes().getNamedItem("name").getNodeValue();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse file: " + files[0].getAbsolutePath(), e);
+        }
     }
 
     private void initXMLInfra() throws ParserConfigurationException, TransformerConfigurationException {
@@ -57,18 +71,8 @@ public class ProxyDirectoryHandler implements ProxyFileHandler, ProxyStatsCollec
         proxyFilesDir = getDirNamed("proxies");
         targetFilesDir = getDirNamed("targets");
         policyDir = getDirNamed("policies");
-        statsFile = new File(apiProxyDir, "stats.txt");
     }
 
-    private XStream xStreamInit() {
-        final XStream stream = new XStream(new StaxDriver());
-        stream.processAnnotations(new Class[]{ProxyEndpoint.class,
-                Endpoint.class, FaultRule.class,
-                FaultRules.class, Flow.class, FlowSteps.class,
-                RequestFlow.class, ResponseFlow.class, Step.class,
-                TargetEndpoint.class});
-        return stream;
-    }
 
     private File getDirNamed(String dirName) {
         if (apiProxyDir == null) {
@@ -91,7 +95,11 @@ public class ProxyDirectoryHandler implements ProxyFileHandler, ProxyStatsCollec
 
     @Override
     public List<Endpoint> getEndpoints() {
-        return getProxyFiles().map(this::toEndpoint).collect(Collectors.toList());
+        final List<Endpoint> endpoints = getProxyFiles().map(this::toEndpoint).collect(Collectors.toList());
+        if (endpoints.isEmpty()) {
+            System.err.println("Warning!! No endpoints found.");
+        }
+        return endpoints;
     }
 
     private Endpoint toEndpoint(File file) {
@@ -149,6 +157,11 @@ public class ProxyDirectoryHandler implements ProxyFileHandler, ProxyStatsCollec
         updates.forEach(this::createFile);
     }
 
+    @Override
+    public String proxyName() {
+        return proxyName;
+    }
+
     private void createFile(PolicyUpdate u) {
         try {
             final File policyName = new File(policyDir, u.name + ".xml");
@@ -160,11 +173,6 @@ public class ProxyDirectoryHandler implements ProxyFileHandler, ProxyStatsCollec
 
     @Override
     public void close() throws IOException {
-        stats.store(new FileWriter(statsFile), "Proxy Stats Generated: " + LocalDate.now());
-    }
 
-    @Override
-    public void update(String measure, int count) {
-        stats.setProperty(measure, "" + count);
     }
 }

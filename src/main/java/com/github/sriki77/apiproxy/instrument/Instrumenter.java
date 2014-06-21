@@ -2,7 +2,6 @@ package com.github.sriki77.apiproxy.instrument;
 
 
 import com.github.sriki77.apiproxy.instrument.io.ProxyFileHandler;
-import com.github.sriki77.apiproxy.instrument.io.ProxyStatsCollector;
 import com.github.sriki77.apiproxy.instrument.io.ProxyZipFileHandler;
 import com.github.sriki77.apiproxy.instrument.model.Endpoint;
 import com.github.sriki77.apiproxy.instrument.model.FlowSteps;
@@ -56,13 +55,11 @@ public class Instrumenter {
 
     private void writeReport() throws IOException {
         final List<Endpoint> endpoints = proxyFileHandler.getEndpoints();
-        final KVMapInstrumentReportGenerator reportGenerator = new KVMapInstrumentReportGenerator(kvInstrumentFile, reportDirectory);
-        endpoints.forEach(reportGenerator::generateReport);
-    }
+        try (final KVMapInstrumentReportGenerator reportGenerator = new KVMapInstrumentReportGenerator(proxyFileHandler.proxyName(),kvInstrumentFile, reportDirectory)) {
+            endpoints.forEach(reportGenerator::generateReport);
+        }
 
-    private void addStats(List<Endpoint> endpoints, ProxyStatsCollector collector) {
-        collector.update("Endpoints", endpoints.size());
-        collector.update("Policies", policiesCount(endpoints));
+        System.err.println("Generated report in directory: " + reportDirectory.getAbsolutePath());
     }
 
     private int policiesCount(List<Endpoint> endpoints) {
@@ -245,8 +242,5 @@ public class Instrumenter {
         this.reportDirectory = reportDirectory;
     }
 
-    public File getReportDirectory() {
-        return reportDirectory;
-    }
 }
 

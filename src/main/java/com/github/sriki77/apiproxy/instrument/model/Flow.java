@@ -2,6 +2,7 @@ package com.github.sriki77.apiproxy.instrument.model;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.w3c.dom.Node;
 
 @XStreamAlias("Flow")
@@ -20,6 +21,7 @@ public class Flow implements NodeHolder, LocationProvider {
     @XStreamAsAttribute
     private String name;
 
+    @XStreamOmitField
     protected LocationProvider parent;
 
     @Override
@@ -54,5 +56,9 @@ public class Flow implements NodeHolder, LocationProvider {
     @Override
     public String location() {
         return LocationProvider.append(parent, name);
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -2,6 +2,7 @@ package com.github.sriki77.apiproxy.instrument.model;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 @XStreamAlias("Step")
 public class Step implements LocationProvider {
@@ -14,10 +15,12 @@ public class Step implements LocationProvider {
 
     @XStreamAlias("executed")
     @XStreamAsAttribute
-    protected boolean executed=true;
+    protected boolean executed = true;
 
+    @XStreamOmitField
     protected String baseName;
 
+    @XStreamOmitField
     protected LocationProvider parent;
 
     protected Step(String name, String condition, LocationProvider parent) {
@@ -64,17 +67,17 @@ public class Step implements LocationProvider {
     }
 
 
-    public String locationUsingBaseName() {
+    public String policyNameAndCondition() {
         String loc = "Policy: " + baseName;
         if (condition != null) {
             loc += " Condition: " + condition;
         }
-        return LocationProvider.append(parent, loc);
+        return loc;
     }
 
     public String initUsingTemplate(String template, String name) {
         return String.format(template, name, LocationProvider.endpointName(this),
-                LocationProvider.proxyFileName(this), LocationProvider.flowName(this), locationUsingBaseName());
+                LocationProvider.proxyFileName(this), LocationProvider.flowName(this), policyNameAndCondition());
     }
 
     public String getName() {
@@ -85,4 +88,7 @@ public class Step implements LocationProvider {
         this.executed = executed;
     }
 
+    public boolean isExecuted() {
+        return executed;
+    }
 }

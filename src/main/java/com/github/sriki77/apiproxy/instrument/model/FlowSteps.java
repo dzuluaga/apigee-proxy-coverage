@@ -1,6 +1,7 @@
 package com.github.sriki77.apiproxy.instrument.model;
 
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -14,6 +15,7 @@ public abstract class FlowSteps implements NodeHolder, LocationProvider {
     @XStreamImplicit(itemFieldName = "Step")
     protected List<Step> steps;
 
+    @XStreamOmitField
     protected LocationProvider parent;
 
     @Override

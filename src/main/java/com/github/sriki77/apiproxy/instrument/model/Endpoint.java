@@ -2,6 +2,7 @@ package com.github.sriki77.apiproxy.instrument.model;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -28,10 +29,13 @@ public abstract class Endpoint implements NodeHolder, LocationProvider {
     private String name;
 
 
+    @XStreamOmitField
     private File xmlFile;
 
+    @XStreamOmitField
     private Node node;
 
+    @XStreamOmitField
     private List<PolicyUpdate> updates;
 
     public File getXmlFile() {
@@ -73,7 +77,7 @@ public abstract class Endpoint implements NodeHolder, LocationProvider {
     }
 
 
-    protected abstract String endpointType();
+    public abstract String endpointType();
 
     public void init(File xmlFile, Document node) {
         this.xmlFile = xmlFile;
@@ -98,5 +102,16 @@ public abstract class Endpoint implements NodeHolder, LocationProvider {
 
     public List<PolicyUpdate> updates() {
         return updates == null ? new ArrayList<>() : updates;
+    }
+
+    @Override
+    public String toString() {
+        return "Endpoint{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+
+    public String getName() {
+        return name;
     }
 }

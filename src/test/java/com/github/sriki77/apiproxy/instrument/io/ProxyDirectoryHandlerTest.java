@@ -7,8 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,7 +43,7 @@ public class ProxyDirectoryHandlerTest {
 
     @After
     public void tearDown() throws Exception {
-        FileUtils.deleteDirectory(testTempDir);
+        FileUtils.deleteQuietly(testTempDir);
     }
 
     @Test
@@ -177,15 +179,7 @@ public class ProxyDirectoryHandlerTest {
     }
 
     @Test
-    public void shouldGenerateStats() throws Exception {
-        handler.update("endpoint",10);
-        handler.update("flows",20);
-        handler.close();
-        final File statsFile = new File(apiProxyDir, "stats.txt");
-        assertThat(statsFile.exists(),is(true));
-        final Properties props = new Properties();
-        props.load(new FileReader(statsFile));
-        assertThat(props.getProperty("endpoint"),is("10"));
-        assertThat(props.getProperty("flows"),is("20"));
+    public void shouldDetermineProxyName() throws Exception {
+      assertThat(handler.proxyName(),is("Profile_Test_Name"));
     }
 }

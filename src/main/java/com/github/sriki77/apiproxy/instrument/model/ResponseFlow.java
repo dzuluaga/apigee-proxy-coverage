@@ -1,11 +1,13 @@
 package com.github.sriki77.apiproxy.instrument.model;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.w3c.dom.Node;
 
 @XStreamAlias("Response")
 public class ResponseFlow extends FlowSteps {
 
+    @XStreamOmitField
     private Node node;
 
     @Override

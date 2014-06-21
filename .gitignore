@@ -7,3 +7,4 @@ release.properties
 *.iml
 out
 profile_test*
+cov_report

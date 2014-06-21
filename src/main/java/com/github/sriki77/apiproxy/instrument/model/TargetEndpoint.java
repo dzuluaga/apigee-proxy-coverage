@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public class TargetEndpoint extends Endpoint {
 
     @Override
-    protected String endpointType() {
+    public String endpointType() {
         return "Target";
     }
 }
