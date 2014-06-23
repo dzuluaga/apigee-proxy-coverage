@@ -5,20 +5,20 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.ArrayList;
 import java.util.List;
 
-@XStreamAlias("EndpointStats")
-public class EndpointStats extends Stats {
-    protected List<FlowStats> flowStats = new ArrayList<>();
+@XStreamAlias("EndpointStat")
+public class EndpointStat extends Stats {
+    protected List<FlowStat> stats = new ArrayList<>();
     public String endpointType;
 
 
     @Override
     protected void calcCoverage() {
-        flowStats.forEach(f -> f.calcCoverage());
+        stats.forEach(f -> f.calcCoverage());
         super.calcCoverage();
     }
 
 
-    public void add(FlowStats flowStats) {
-        this.flowStats.add(flowStats);
+    public void add(FlowStat flowStat) {
+        this.stats.add(flowStat);
     }
 }

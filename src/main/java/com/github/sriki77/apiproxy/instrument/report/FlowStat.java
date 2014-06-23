@@ -5,10 +5,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import java.util.List;
 
-@XStreamAlias("FlowStats")
-public class FlowStats extends Stats {
+@XStreamAlias("FlowStat")
+public class FlowStat extends Stats {
+    public String flowType;
 
-    protected FlowStats(String name, List<Step> steps) {
+    protected FlowStat(String flowType,String name, List<Step> steps) {
+        this.flowType = flowType;
         this.name = name;
         updateStats(steps);
     }

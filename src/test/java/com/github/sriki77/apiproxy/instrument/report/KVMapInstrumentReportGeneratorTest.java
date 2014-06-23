@@ -76,10 +76,10 @@ public class KVMapInstrumentReportGeneratorTest {
         final KVMapInstrumentReportGenerator generator = new KVMapInstrumentReportGenerator(handler.proxyName(), instrumentFile, testTempDir);
         Endpoint e = getEndpoint("partner");
         generator.generateReport(e);
-        assertThat(new File(testTempDir,e.getXmlFile().getName()).exists(),is(true));
+        assertThat(new File(testTempDir, e.endpointType() + "_" + e.getXmlFile().getName()).exists(), is(true));
         e = getEndpoint("oauth2");
         generator.generateReport(e);
-        assertThat(new File(testTempDir,e.getXmlFile().getName()).exists(),is(true));
+        assertThat(new File(testTempDir, e.endpointType() + "_" + e.getXmlFile().getName()).exists(), is(true));
     }
 
 

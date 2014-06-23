@@ -1,15 +1,21 @@
 package com.github.sriki77.apiproxy.instrument.report;
 
 import com.github.sriki77.apiproxy.instrument.io.Util;
-import com.github.sriki77.apiproxy.instrument.model.*;
+import com.github.sriki77.apiproxy.instrument.model.Endpoint;
+import com.github.sriki77.apiproxy.instrument.model.FaultRule;
+import com.github.sriki77.apiproxy.instrument.model.Flow;
+import com.github.sriki77.apiproxy.instrument.model.Step;
 import com.jayway.jsonpath.JsonPath;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,17 +25,20 @@ import java.util.stream.Collectors;
 public class KVMapInstrumentReportGenerator implements InstrumentReportGenerator, Closeable {
 
     private static List<Step> overallSteps = new ArrayList<>();
-    private static ProxyStats proxyStats = new ProxyStats();
+    private static ProxyStat proxyStat = new ProxyStat();
 
     private String proxyName;
     private final File kvInstrumentFile;
     private final File reportDirectory;
     private List<String> instrumentEntries;
+    private File summaryXMLFile;
+    ;
 
     public KVMapInstrumentReportGenerator(String proxyName, File kvInstrumentFile, File reportDirectory) throws IOException {
         this.proxyName = proxyName;
         this.kvInstrumentFile = kvInstrumentFile;
         this.reportDirectory = reportDirectory;
+        summaryXMLFile = new File(reportDirectory, "summary.xml");
         instrumentEntries = cleanUpEntries(JsonPath.read(this.kvInstrumentFile, "$.entry[*].value"));
     }
 
@@ -47,13 +56,13 @@ public class KVMapInstrumentReportGenerator implements InstrumentReportGenerator
 
     private void updateStats(Endpoint e, List<Step> allSteps) {
         overallSteps.addAll(allSteps);
-        EndpointStats endpointStats = new EndpointStats();
-        endpointStats.name=e.getName();
-        endpointStats.endpointType =e.endpointType();
+        EndpointStat endpointStat = new EndpointStat();
+        endpointStat.name = e.getName();
+        endpointStat.endpointType = e.endpointType();
 
-        updateStats(allSteps, endpointStats);
-        proxyStats.add(endpointStats);
-        updateFlowStats(e, endpointStats);
+        updateStats(allSteps, endpointStat);
+        proxyStat.add(endpointStat);
+        updateFlowStats(e, endpointStat);
     }
 
 
@@ -101,7 +110,7 @@ public class KVMapInstrumentReportGenerator implements InstrumentReportGenerator
         return steps;
     }
 
-    private void updateFlowStats(Endpoint e, EndpointStats stats) {
+    private void updateFlowStats(Endpoint e, EndpointStat stats) {
         updateFaultFlowStats(e, stats);
         updatePreFlowStats(e, stats);
         updatePostFlowStats(e, stats);
@@ -109,41 +118,86 @@ public class KVMapInstrumentReportGenerator implements InstrumentReportGenerator
             List<Step> steps = new ArrayList<>();
             steps.addAll(flow.getRequestFlow().getSteps());
             steps.addAll(flow.getResponseFlow().getSteps());
-            stats.add(new FlowStats("Flow: " + flow.getName(), steps));
+            stats.add(new FlowStat("Flow", flow.getName(), steps));
         }
     }
 
-    private void updatePostFlowStats(Endpoint e, EndpointStats stats) {
+    private void updatePostFlowStats(Endpoint e, EndpointStat stats) {
         List<Step> steps = new ArrayList<>();
         steps.addAll(e.getPostflow().getRequestFlow().getSteps());
         steps.addAll(e.getPostflow().getResponseFlow().getSteps());
-        stats.add(new FlowStats("Post Flow", steps));
+        stats.add(new FlowStat("Post Flow", "", steps));
     }
 
-    private void updatePreFlowStats(Endpoint e, EndpointStats stats) {
+    private void updatePreFlowStats(Endpoint e, EndpointStat stats) {
         List<Step> steps = new ArrayList<>();
         steps.addAll(e.getPreflow().getRequestFlow().getSteps());
         steps.addAll(e.getPreflow().getResponseFlow().getSteps());
-        stats.add(new FlowStats("Pre Flow", steps));
+        stats.add(new FlowStat("Pre Flow", "", steps));
     }
 
-    private void updateFaultFlowStats(Endpoint e, EndpointStats stats) {
+    private void updateFaultFlowStats(Endpoint e, EndpointStat stats) {
         for (FaultRule faultRule : e.getFaultRules().getFaultRules()) {
-            stats.add(new FlowStats("Fault Rule: " + faultRule.getName(), faultRule.getSteps()));
+            stats.add(new FlowStat("Fault Rule", faultRule.getName(), faultRule.getSteps()));
         }
 
     }
 
     @Override
     public void close() throws IOException {
-        proxyStats.name = proxyName;
-        updateStats(overallSteps, proxyStats);
-        proxyStats.calcCoverage();
+        proxyStat.name = proxyName;
+        updateStats(overallSteps, proxyStat);
+        proxyStat.calcCoverage();
         final XStream xStream = new XStream();
-        xStream.processAnnotations(new Class[]{EndpointStats.class,
-                FlowStats.class, ProxyStats.class});
-        final PrettyPrintWriter writer = new PrettyPrintWriter(new FileWriter(new File(reportDirectory, "summary.xml")));
-        xStream.marshal(proxyStats, writer);
+        xStream.processAnnotations(new Class[]{EndpointStat.class,
+                FlowStat.class, ProxyStat.class});
+        final PrettyPrintWriter writer = new PrettyPrintWriter(new FileWriter(summaryXMLFile));
+        xStream.marshal(proxyStat, writer);
         writer.close();
+        generateHTMLReport();
+    }
+
+    private void generateHTMLReport() {
+        generateSummary();
+        generateProxyHtml();
+        copyBootstrapDirectory();
+    }
+
+    private void copyBootstrapDirectory() {
+        try {
+            FileUtils.copyDirectoryToDirectory(new File(this.getClass().getResource("/report/bootstrap").toURI().toURL().getFile()), reportDirectory);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void generateProxyHtml() {
+        try {
+            final Transformer transformer = TransformerFactory.newInstance()
+                    .newTransformer(new StreamSource(this.getClass()
+                            .getResourceAsStream("/report/proxy.xsl")));
+            final File[] proxyFiles = reportDirectory.listFiles((dir, name) -> name.startsWith("Proxy_") || name.startsWith("Target_"));
+            for (File proxyFile : proxyFiles) {
+                transformer.transform(new StreamSource(new FileReader(proxyFile)),
+                        new StreamResult(new FileWriter(new File(reportDirectory,
+                                FilenameUtils.getBaseName(proxyFile.getName()) + ".html"))));
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void generateSummary() {
+        try {
+            final Transformer transformer = TransformerFactory.newInstance()
+                    .newTransformer(new StreamSource(this.getClass()
+                            .getResourceAsStream("/report/summary.xsl")));
+            transformer.transform(new StreamSource(new FileReader(summaryXMLFile)),
+                    new StreamResult(new FileWriter(new File(reportDirectory, "summary.html"))));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

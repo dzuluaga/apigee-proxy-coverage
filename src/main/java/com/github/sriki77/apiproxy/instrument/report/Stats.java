@@ -7,17 +7,18 @@ import java.util.List;
 public class Stats {
     protected String name;
 
-    protected double coverage;
+    protected long coverage;
 
     protected int totalPolicies;
 
     protected int executedPolicies;
 
     protected void calcCoverage() {
-        if(totalPolicies==0){
+        if (totalPolicies == 0) {
             return;
         }
-        coverage = executedPolicies * 100.0 / totalPolicies;
+        coverage = Math.round(executedPolicies * 100.0 / totalPolicies);
+
     }
 
     protected void updateStats(List<Step> steps) {

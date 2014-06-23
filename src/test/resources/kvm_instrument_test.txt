@@ -1,0 +1,25 @@
+{
+  "entry" : [ {
+    "name" : "fault_key_not_found1403002443561",
+    "value" : "Proxy:default,File:default.xml,keyValidate:RequestFlow,Policy: fault_key_not_found Condition: (request.queryparam.key=null) or (request.queryparam.key=EMPTY)"
+  }, {
+    "name" : "js_set_flow_resource_name1403002443559",
+    "value" : "Proxy:oauth2,File:oauth2.xml,user_register:RequestFlow, Policy: assign_set_user_create_target"
+  }, {
+    "name" : "assign_key_fault_res1403002443520",
+    "value" : "Proxy:default,File:default.xml,FaultRule: validationfailures,Policy: assign_key_fault_res Condition: error.message=\"Invalid ApiKey\""
+  }, {
+    "name" : "verify_apikey_get_app_attributtes1403002443561",
+    "value" : "Proxy:partner,File:partner.xml,auth_oauth_terms:RequestFlow,Policy: fault_no_locale Condition: (locale=null or locale=EMPTY)"
+  }, {
+    "name" : "log_splunk1403002443560",
+    "value" : "Proxy:default,File:default.xml,PostFlow:ResponseFlow,Policy: log_splunk"
+  }, {
+    "name" : "js_setup_splunk_vars1403002443559",
+    "value" : "Proxy:default,File:default.xml,PostFlow:ResponseFlow,Policy: js_setup_splunk_vars"
+  }, {
+    "name" : "assign_key_succ_res1403002443562",
+    "value" : "Proxy:default,File:default.xml,keyValidate:ResponseFlow,Policy: assign_key_succ_res"
+  } ],
+  "name" : "instrument"
+}

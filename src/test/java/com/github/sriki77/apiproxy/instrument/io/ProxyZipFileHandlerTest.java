@@ -27,7 +27,7 @@ public class ProxyZipFileHandlerTest {
 
     @After
     public void tearDown() throws Exception {
-        FileUtils.deleteDirectory(testTempDir);
+        FileUtils.deleteQuietly(testTempDir);
     }
 
     @Test
