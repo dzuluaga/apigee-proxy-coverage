@@ -8,8 +8,8 @@ import com.github.sriki77.apiproxy.instrument.model.Step;
 import com.jayway.jsonpath.JsonPath;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -160,12 +160,15 @@ public class KVMapInstrumentReportGenerator implements InstrumentReportGenerator
     private void generateHTMLReport() {
         generateSummary();
         generateProxyHtml();
-        copyBootstrapDirectory();
+        copyBootStrapCSS();
     }
 
-    private void copyBootstrapDirectory() {
+    private void copyBootStrapCSS() {
         try {
-            FileUtils.copyDirectoryToDirectory(new File(this.getClass().getResource("/report/bootstrap").toURI().toURL().getFile()), reportDirectory);
+            final FileWriter destFile = new FileWriter(new File(reportDirectory, "bootstrap.min.css"));
+            IOUtils.copy(this.getClass().getResourceAsStream("/report/bootstrap.min.css"), destFile);
+            destFile.close();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,17 +1,13 @@
 <?xml version="1.0"?>
 <xsl:stylesheet version="1.0" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:template match="/">
-        <html lang="en">
+        <html>
             <head>
                 <meta charset="utf-8"/>
                 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1"/>
                 <title>Apigee Proxy Coverage Report</title>
-                <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-                <!--<script src="bootstrap/js/html5shiv.js"></script>-->
-                <!--<script src="bootstrap/js/respond.min.js"></script>-->
-                <!--<script src="bootstrap/js/jquery.min.js"></script>-->
-                <!--<script src="bootstrap/js/bootstrap.min.js"></script>-->
+                <link href="bootstrap.min.css" rel="stylesheet"/>
             </head>
             <body>
                 <section id="heading">

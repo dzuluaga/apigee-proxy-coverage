@@ -7,11 +7,7 @@
                 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1"/>
                 <title>Apigee Proxy Coverage Report</title>
-                <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-                <!--<script src="bootstrap/js/html5shiv.js"></script>-->
-                <!--<script src="bootstrap/js/respond.min.js"></script>-->
-                <!--<script src="bootstrap/js/jquery.min.js"></script>-->
-                <!--<script src="bootstrap/js/bootstrap.min.js"></script>-->
+                <link href="bootstrap.min.css" rel="stylesheet"/>
             </head>
             <body>
                 <section id="heading">
