@@ -25,8 +25,12 @@ public class Step implements LocationProvider {
 
     protected Step(String name, String condition, LocationProvider parent) {
         this.name = name;
-        this.condition = condition;
+        this.condition = escapeCondition(condition);
         this.parent = parent;
+    }
+
+    private String escapeCondition(String condition) {
+        return condition==null? null:condition.replace("<","&lt;").replace(">","&gt;");
     }
 
     public void setName(String name) {

@@ -13,33 +13,19 @@
                 <section id="heading">
                     <div class="well">
                         <div class="row">
-                            <div class="col-lg-3">
-                                <h4>
-                                    <i>
-                                        <xsl:value-of select="ProxyStat/name"/>
-                                    </i>
-
-                                </h4>
-                            </div>
+                            <div class="col-lg-4"><p/></div>
+                            <div class="col-lg-2"><h4><i>API Proxy: <xsl:value-of select="ProxyStat/name"/></i></h4></div>
                             <div class="col-lg-3" style="padding-top: 12px;">
-                                Coverage
-                                <xsl:apply-templates select="ProxyStat/coverage"/>
+                                Coverage:
+                                <xsl:apply-templates select="ProxyStat/coverage"/>, <xsl:value-of select="ProxyStat/executedPolicies"/> of <xsl:value-of select="ProxyStat/totalPolicies"/> covered
                             </div>
-                            <div class="col-lg-3" style="padding-top: 12px;">
-                                Total Policies:
-                                <xsl:value-of select="ProxyStat/totalPolicies"/>
-                            </div>
-                            <div class="col-lg-3" style="padding-top: 12px;">
-                                Total Policies Executed:
-                                <xsl:value-of select="ProxyStat/executedPolicies"/>
-
-                            </div>
+                            <div class="col-lg-3"><p/></div>
                         </div>
                     </div>
                 </section>
                 <section id="Coverage Details">
                     <div class="container">
-                        <div class="text-warning">
+                        <div class="text-warning" align="center">
                             <h4>Proxy Endpoints</h4>
                         </div>
                         <xsl:for-each select="//EndpointStat/endpointType[text() = 'Proxy']">
@@ -50,7 +36,7 @@
                     </div>
 
                     <div class="container">
-                        <div class="text-warning">
+                        <div class="text-warning" align="center">
                             <h4>Target Endpoints</h4>
                         </div>
                         <xsl:for-each select="//EndpointStat/endpointType[text() = 'Target']">
@@ -91,41 +77,26 @@
         </html>
     </xsl:template>
     <xsl:template match="EndpointStat">
-        <div class="col-lg-12">
+        <div class="col-lg-2"><p/></div>
+        <div class="col-lg-8">
+            <div>
+                <h5>
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="endpointType"/>_<xsl:value-of select="name"/>.html
+                        </xsl:attribute>
+                        Endpoint: <xsl:value-of select="name"/>  ( <xsl:apply-templates select="coverage"/>, <xsl:value-of select="executedPolicies"/> of <xsl:value-of select="totalPolicies"/> )
+                    </a>
+                </h5>
+            </div>
             <table class="table table-hover">
-                <caption>
-                    <i>Endpoint:
-                        <xsl:value-of select="name"/>
-                    </i>
-                </caption>
                 <thead>
                     <tr>
                         <th>Flow Name</th>
                         <th>Coverage</th>
-                        <th>Total</th>
-                        <th>Executed</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="text-info">
-                        <td>
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of select="endpointType"/>_<xsl:value-of select="name"/>.html
-                                </xsl:attribute>
-                                Endpoint Overall
-                            </a>
-                        </td>
-                        <td>
-                            <xsl:apply-templates select="coverage"/>
-                        </td>
-                        <td>
-                            <xsl:value-of select="totalPolicies"/>
-                        </td>
-                        <td>
-                            <xsl:value-of select="executedPolicies"/>
-                        </td>
-                    </tr>
                     <xsl:for-each select="stats/FlowStat">
                         <tr>
                             <td>
@@ -154,19 +125,14 @@
                                 </a>
                             </td>
                             <td>
-                                <xsl:apply-templates select="coverage"/>
-                            </td>
-                            <td>
-                                <xsl:value-of select="totalPolicies"/>
-                            </td>
-                            <td>
-                                <xsl:value-of select="executedPolicies"/>
+                                <xsl:apply-templates select="coverage"/>, <xsl:value-of select="executedPolicies"/> of <xsl:value-of select="totalPolicies"/>
                             </td>
                         </tr>
                     </xsl:for-each>
                 </tbody>
             </table>
         </div>
+        <div class="col-lg-2"><p/></div>
     </xsl:template>
     <xsl:template match="coverage">
         <xsl:if test="current() &lt; 50">

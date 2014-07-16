@@ -13,21 +13,14 @@
                 <section id="heading">
                     <div class="well">
                         <div class="row">
-                            <div class="col-lg-3">
+                            <div class="col-lg-12" align="center">
                                 <h4>
-                                    <i>
-                                        Proxy:
+                                        Endpoint:
                                         <xsl:value-of select="ProxyEndpoint/@name"/>
                                         <xsl:value-of select="TargetEndpoint/@name"/>
-                                    </i>
+                                        <br/>
+                                        <small>(Policy Execution Stats)</small>
                                 </h4>
-                            </div>
-                            <div class="col-lg-9" align="right">
-                                <h6>
-                                    <i>
-                                        Policy Execution Stats
-                                    </i>
-                                </h6>
                             </div>
                         </div>
                     </div>
@@ -36,12 +29,16 @@
                 <section id="Execution Details">
                     <div class="container">
                         <xsl:apply-templates select="//PreFlow"/>
+                        <p/>
                         <xsl:apply-templates select="//PostFlow"/>
+                        <p/>
                         <xsl:for-each select="//FaultRules/FaultRule">
                             <xsl:apply-templates select="."/>
+                            <p/>
                         </xsl:for-each>
                         <xsl:for-each select="//Flows/Flow">
                             <xsl:apply-templates select="."/>
+                            <p/>
                         </xsl:for-each>
                     </div>
                 </section>
@@ -78,21 +75,18 @@
     </xsl:template>
     <xsl:template match="PreFlow|PostFlow|Flow">
         <div class="row">
-            <div class="col-lg-12">
-                <a>
-                    <xsl:attribute name="name">
-                        <xsl:value-of select="@name"/>
-                    </xsl:attribute>
-                </a>
+            <a>
+                <xsl:attribute name="name">
+                    <xsl:value-of select="@name"/>
+                </xsl:attribute>
+            </a>
+            <div class="col-lg-2"><p/></div>
+            <div class="col-lg-8">
+                <h4><span class="text-muted">Flow: <xsl:value-of select="@name"/></span></h4>
                 <table class="table">
-                    <caption>
-                        <i>
-                            Flow:
-                            <xsl:value-of select="@name"/>
-                        </i>
-                    </caption>
                     <thead>
                         <tr>
+                            <th></th>
                             <th><small>Policy Name</small></th>
                             <th><small>Condition</small></th>
                         </tr>
@@ -100,7 +94,7 @@
                     <tbody>
                         <xsl:if test="Request/Step">
                             <tr class="text-primary">
-                                <td colspan="2">
+                                <td colspan="3" align="center">
                                 <small>Request Flow</small>
                                 </td>
                             </tr>
@@ -108,7 +102,7 @@
                         </xsl:if>
                         <xsl:if test="Response/Step">
                             <tr class="text-primary">
-                                <td colspan="2">
+                                <td colspan="3" align="center">
                                 <small>Response Flow</small>
                                 </td>
                             </tr>
@@ -117,25 +111,24 @@
                     </tbody>
                 </table>
             </div>
+             <div class="col-lg-2"><p/></div>
         </div>
     </xsl:template>
     <xsl:template match="FaultRule">
         <div class="row">
-            <div class="col-lg-12">
-                <a>
-                    <xsl:attribute name="name">
-                        <xsl:value-of select="@name"/>
-                    </xsl:attribute>
-                </a>
+            <a>
+                <xsl:attribute name="name">
+                    <xsl:value-of select="@name"/>
+                </xsl:attribute>
+            </a>
+             <div class="col-lg-2"><p/></div>
+            <div class="col-lg-8">
+
+                <h4><span class="text-muted">Fault Rule: <xsl:value-of select="@name"/></span></h4>
                 <table class="table">
-                    <caption>
-                        <i>
-                            Fault Rule:
-                            <xsl:value-of select="@name"/>
-                        </i>
-                    </caption>
                     <thead>
                         <tr>
+                            <th></th>
                             <th><small>Policy Name</small></th>
                             <th><small>Condition</small></th>
                         </tr>
@@ -147,6 +140,7 @@
                     </tbody>
                 </table>
             </div>
+             <div class="col-lg-2"><p/></div>
         </div>
     </xsl:template>
     <xsl:template match="Request|Response">
@@ -156,19 +150,42 @@
     </xsl:template>
     <xsl:template match="Step">
         <tr>
-            <xsl:if test="@executed='true'">
-                <xsl:attribute name="class">success</xsl:attribute>
-            </xsl:if>
             <td>
+                 <xsl:choose>
+                        <xsl:when test="@executed='true'">
+                            <span class="text-success"> &#10004; </span>
+                        </xsl:when>
+                        <xsl:otherwise>
+                             <span class="text-danger"> &#10008; </span>
+                        </xsl:otherwise>
+                    </xsl:choose>
+            </td>
+            <td>
+
                 <small>
-                    <xsl:value-of select="Name"/>
+                    <xsl:choose>
+                        <xsl:when test="@executed='true'">
+                            <span class="text-success"><xsl:value-of select="Name"/></span>
+                        </xsl:when>
+                        <xsl:otherwise>
+                             <span class="text-danger"> <xsl:value-of select="Name"/></span>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    
                 </small>
             </td>
             <td>
                 <xsl:choose>
                     <xsl:when test="Condition">
                         <small>
-                            <xsl:value-of select="Condition"/>
+                             <xsl:choose>
+                                <xsl:when test="@executed='true'">
+                                    <span class="text-success"><xsl:value-of select="Condition"/></span>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                     <span class="text-danger"> <xsl:value-of select="Condition"/></span>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </small>
                     </xsl:when>
                     <xsl:otherwise>
