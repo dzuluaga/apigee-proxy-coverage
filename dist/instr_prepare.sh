@@ -13,3 +13,4 @@ echo "Deploying Instrumented $api bundle"
 
 echo "Deleting  Instrumented KV Data"
 curl -X DELETE -u $username:$password "https://api.enterprise.apigee.com/v1/o/$org/apis/$api/keyvaluemaps/instrument"
+echo "Note: You can ignore the last error - its trying to delete a key value map named 'instrument' if it exists."
