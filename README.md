@@ -53,6 +53,13 @@ Sample Report Screenshots
 
 ![policy execution](https://raw.githubusercontent.com/sriki77/apigee-proxy-coverage/master/policy_exec.png)
 
+Coverage Numbers
+----------------
+
+Coverage is percentage of policies executed against the total number of policies that exists in the API proxy. With this definition it's possible to have overall coverage at 100%, while the flow level coverage be less than 100%. This is because all the policies would have been executed - but not on all paths.
+
+It's best to achieve 100% flow level coverage in effect attain 100% overall coverage, than vice versa.
+
 Limitations
 --------------
 All proxy endpoints are expected to have **only one**
